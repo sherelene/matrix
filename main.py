@@ -41,10 +41,6 @@ with open("practice_input.txt") as filename:
         content.append(line.split())
 
 
-    # cleans up data from file even more by getting rid of any "\n" found in the arrays
-    #content = [[s.rstrip('\n') for s in nested if not s.isspace()] for nested in content]
-    #content = [nested for nested in content if nested]
-
 
     # declare and initialize array that we will start using as coefficients
     coefficient = [[0 for i in range(n)] for j in range(m)]
