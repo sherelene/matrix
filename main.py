@@ -17,11 +17,20 @@ def forward_elimination(coeffs, consts):
     backward_elimination(coeffs, consts)
 
 
-def backward_elimination(coeffs, consts):
-    x =np.zeros(col-1)
-    for i in np.arange(rows-1, -1, -1):
-        x[i] = (coeffs[i, -1] - coeffs[i, 0:col-1]@x)/coeffs[i, i]
+def backward_elimination(coeffs, const):
+    #x = np.zeros(n, float)
+
+    #x[col-1] = b[col-1] / A[col-1, col-1]
+    x = np.zeros(col - 1)
+    for i in np.arange(rows - 1, -1, -1):
+        x[i] = (coeffs[i, -1] - np.dot(coeffs[i, 0:col - 1], x)) / coeffs[i, i]
     print(x)
+
+    print("answer", x)
+
+
+
+    #print(x)
 
 
 with open("practice_input.txt") as filename:
@@ -52,22 +61,23 @@ with open("practice_input.txt") as filename:
     # declare and initialize array that we will start using as constants
     constant_array = [0 for i in range(n)]
     for j in range(n):
-        #constant_array[j] = float(content[n][j])
+        constant_array[j] = float(content[n-1][j])
         last_column = coefficient[j]
         last_column.append(float(content[n][j]))
     # make constant array into a vector
     constant = np.array(constant_array)
     matrix = coefficient[:-1]
-    print(len(matrix))
-    print("array", matrix)
-
-
+    print(len(coefficient))
+   # print("array", matrix)
 
     rows = np.shape(matrix)[0]
     col = np.shape(matrix)[1]
 
+    #rows = np.shape(coefficient)[0]
+    #col = np.shape(coefficient)[1]
 
 
-    coefficient = np.array(matrix, dtype=float)
-    naive_gaussian(coefficient, constant)
+
+    matrix = np.array(matrix, dtype=float)
+    naive_gaussian(matrix, constant)
 
