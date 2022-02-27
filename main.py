@@ -4,19 +4,16 @@ import numpy as np
 
 
 def naive_gaussian(coeffs, consts):
-    num_of_coeff = len(coeffs)
-    solution = [0 for i in range(n)]
     forward_elimination(coeffs, consts)
-    backward_elimination(coeffs, consts)
+
 
 
 def forward_elimination(coeffs, consts):
-    num_of_coeff = len(coeffs)
-
-    for k in range(col - 1):
-        for i in range(k+1, rows):
-            coeffs[i:] = coeffs[i:] - (coeffs[i][k]/coeffs[k][k]) * coeffs[i:]
+    for i in range(col - 1):
+        for j in range(i+1, rows):
+            coeffs[j, :] = (coeffs[j, i]/coeffs[i, i]) * coeffs[i,:] - coeffs[j, :]
     print(coeffs)
+    backward_elimination(coeffs, consts)
 
 
 
@@ -25,11 +22,10 @@ def forward_elimination(coeffs, consts):
 
 
 def backward_elimination(coeffs, consts):
-    length = len(coeffs)-1
-    x =np.zeros(length)
-    #for i in np.arange(rows-1, -1, -1):
-        #x[i] = (coeffs[i][-1] - coeffs[i, 0:col-1]@x)/coeffs[i][i]
-    #print(x)
+    x =np.zeros(col-1)
+    for i in np.arange(rows-1, -1, -1):
+        x[i] = (coeffs[i, -1] - coeffs[i, 0:col-1]@x)/coeffs[i, i]
+    print(x)
 
 
 with open("practice_input.txt") as filename:
@@ -62,24 +58,21 @@ with open("practice_input.txt") as filename:
     constant_array = [0 for i in range(n)]
     for j in range(m):
         #constant_array[j] = float(content[n][j])
-        last_column= coefficient[j]
+        last_column = coefficient[j]
         last_column.append(float(content[m][j]))
     # make constant array into a vector
     constant = np.array(constant_array)
-   # coefficient = np.append(coefficient, constant, axis=1)
-    print(coefficient)
+    matrix = coefficient[:-1]
+    print(len(matrix))
+    print("array", matrix)
 
 
 
-    rows = np.shape(last_column)[0]
-    col = np.shape(last_column)[1]
-   # print(content)
-    #print(type(coefficient[0][0]))
-    #print(constant_array)
+    rows = np.shape(matrix)[0]
+    col = np.shape(matrix)[1]
 
-    print(n)
-    print(len(coefficient))
 
-    coefficient = np.array(coefficient, dtype=float)
+
+    coefficient = np.array(matrix, dtype=float)
     naive_gaussian(coefficient, constant)
 
