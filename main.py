@@ -9,9 +9,9 @@ def naive_gaussian(coeffs, consts):
 
 
 def forward_elimination(coeffs, consts):
-    for i in range(col - 1):
-        for j in range(i+1, rows):
-            coeffs[j, :] = (coeffs[j, i]/coeffs[i, i]) * coeffs[i,:] - coeffs[j, :]
+    for k in range(col - 1):
+        for i in range(k+1, rows):
+            coeffs[i, :] = (coeffs[i, k]/coeffs[k, k]) * coeffs[k,:] - coeffs[i, :]
     print(coeffs)
     backward_elimination(coeffs, consts)
 
