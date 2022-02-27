@@ -1,7 +1,9 @@
 # sys.argv[1]
 import sys
 import numpy as np
-
+import pandas as pd
+from decimal import *
+import re
 
 def naive_gaussian(coeffs, consts):
     forward_elimination(coeffs, consts)
@@ -34,13 +36,15 @@ with open("practice_input.txt") as filename:
 
     # takes each line read from file and inputs each number into an element into
     # the file content array
+
     for line in lines:
-        content.append(line.split(" "))
+        content.append(line.split())
 
 
     # cleans up data from file even more by getting rid of any "\n" found in the arrays
-    content = [[s.rstrip('\n') for s in nested if not s.isspace()] for nested in content]
-    content = [nested for nested in content if nested]
+    #content = [[s.rstrip('\n') for s in nested if not s.isspace()] for nested in content]
+    #content = [nested for nested in content if nested]
+
 
     # declare and initialize array that we will start using as coefficients
     coefficient = [[0 for i in range(n)] for j in range(m)]
