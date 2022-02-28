@@ -58,28 +58,26 @@ with open("test2.txt") as filename:
     for i in range(m):
         for j in range(n):
             constants_in_row_matrix[i][j] = float(content[i][j])  # change from string to float
-    print("og matrix", constants_in_row_matrix)
-    # declare and initialize array that we will place the constants in
-    #constant_array = [0 for i in range(n)]
-    for j in range(n):
-        #constant_array[j] = float(content[n - 1][j])
-        last_column = constants_in_row_matrix[j]
-        print("current last column", last_column)
-        last_column.append(float(content[n][j]))
-    print("appended column matrix", constants_in_row_matrix)
-    print("last column", last_column)
-    # make constant array into a vector
-    #constant = np.array(constant_array)
-    matrix = constants_in_row_matrix[:-1]
-    print(len(constants_in_row_matrix))
-    # print("array", matrix)
 
+    for j in range(n):
+        #make constants that are in the last row into the last column
+        last_column = constants_in_row_matrix[j]
+
+        #this part i have no idea why it works but it just does and im too tired to keep trying to figure out how its
+        # appending the constants_in_row_matrix even though i called to append last_column variable and not
+        # constants_in_row_matrix variable
+        last_column.append(constants_in_row_matrix[n][j])
+
+    #remove last row from constants_in_row_matrix for a proper matrix
+    matrix = constants_in_row_matrix[:-1]
+
+    #make variables for new number of rows and columns
     rows = np.shape(matrix)[0]
     col = np.shape(matrix)[1]
 
-    # rows = np.shape(coefficient)[0]
-    # col = np.shape(coefficient)[1]
-
+    # turn our matrix into a numpy matrix array for numpy perks
     matrix = np.array(matrix, dtype=float)
+
+    # call naive_gaussian function
     naive_gaussian(matrix)
 print(timeit.Timer('for i in range(10): oct(i)').timeit())
