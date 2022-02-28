@@ -1,5 +1,6 @@
 # sys.argv[1]
 import timeit
+from decimal import *
 
 print(timeit.Timer('for i in range(10): oct(i)').timeit())
 import sys
@@ -23,20 +24,22 @@ def forward_elimination(matrix):
 
 def backward_elimination(matrix):
     # initialize new array for the answer
-    x = np.zeros(col - 1)
+    x = np.zeros(col - 1, dtype=np.dtype(Decimal))
 
     # iterate backwards using numpy because it's faster
     for i in np.arange(row - 1, -1, -1):  # using rows instead of columns because matrix changed from 5x4 to 4x5
         # x[i] = Bi minus dot product of the current row and the updated x array divided by Aii
         # the dot product returns an int or float
         x[i] = (matrix[i, -1] - np.dot(matrix[i, 0:col - 1], x)) / matrix[i, i]
+        if x[i] == -0:
+            x[i] = 0
 
     print("answer", x)
 
     # print(x)
 
 
-with open("test2.txt") as filename:
+with open("practice_input.txt") as filename:
     # declare array we're going to get from the file
     content = []
 
@@ -70,13 +73,14 @@ with open("test2.txt") as filename:
 
     #remove last row from constants_in_row_matrix for a proper matrix
     proper_matrix = constants_in_row_matrix[:-1]
+    print(proper_matrix)
 
     #make variables for new number of rows and columns
     row = np.shape(proper_matrix)[0]
     col = np.shape(proper_matrix)[1]
 
     # turn our matrix into a numpy matrix array for numpy perks
-    proper_matrix = np.array(proper_matrix, dtype=float)
+    proper_matrix = np.array(proper_matrix, dtype=np.dtype(Decimal))
 
     # call naive_gaussian function
     naive_gaussian(proper_matrix)
