@@ -12,7 +12,7 @@ def naive_gaussian(matrix):
 
 def forward_elimination(matrix):
     for k in range(col - 1):  # pivot row
-        for i in range(k + 1, rows):  # iterate through the rows
+        for i in range(k + 1, row):  # iterate through the rows
             # "[variable, :]" means all columns in that row will be affected
             matrix[i, :] = (matrix[i, k] / matrix[k, k]) * matrix[k, :] - matrix[i, :]  # row subtraction then
             # multiplication and assigning it to the current row
@@ -26,7 +26,7 @@ def backward_elimination(matrix):
     x = np.zeros(col - 1)
 
     # iterate backwards using numpy because it's faster
-    for i in np.arange(rows - 1, -1, -1):  # using rows instead of columns because matrix changed from 5x4 to 4x5
+    for i in np.arange(row - 1, -1, -1):  # using rows instead of columns because matrix changed from 5x4 to 4x5
         # x[i] = Bi minus dot product of the current row and the updated x array divided by Aii
         # the dot product returns an int or float
         x[i] = (matrix[i, -1] - np.dot(matrix[i, 0:col - 1], x)) / matrix[i, i]
@@ -72,7 +72,7 @@ with open("test2.txt") as filename:
     matrix = constants_in_row_matrix[:-1]
 
     #make variables for new number of rows and columns
-    rows = np.shape(matrix)[0]
+    row = np.shape(matrix)[0]
     col = np.shape(matrix)[1]
 
     # turn our matrix into a numpy matrix array for numpy perks
