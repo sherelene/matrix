@@ -69,15 +69,15 @@ with open("test2.txt") as filename:
         last_column.append(constants_in_row_matrix[n][j])
 
     #remove last row from constants_in_row_matrix for a proper matrix
-    matrix = constants_in_row_matrix[:-1]
+    proper_matrix = constants_in_row_matrix[:-1]
 
     #make variables for new number of rows and columns
-    row = np.shape(matrix)[0]
-    col = np.shape(matrix)[1]
+    row = np.shape(proper_matrix)[0]
+    col = np.shape(proper_matrix)[1]
 
     # turn our matrix into a numpy matrix array for numpy perks
-    matrix = np.array(matrix, dtype=float)
+    proper_matrix = np.array(proper_matrix, dtype=float)
 
     # call naive_gaussian function
-    naive_gaussian(matrix)
+    naive_gaussian(proper_matrix)
 print(timeit.Timer('for i in range(10): oct(i)').timeit())
