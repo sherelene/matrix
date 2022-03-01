@@ -18,7 +18,7 @@ def forward_elimination(matrix, row, col):
 
 def backward_elimination(matrix, row, col):
     # initialize new array to store the solved coefficients
-    x = np.zeros(col - 1, dtype=np.dtype(Decimal))
+    x = np.zeros(col - 1)
 
     # iterate backwards for back substitution using numpy because it's faster
     for i in np.arange(row - 1, -1, -1):  # using rows instead of columns because matrix changed from 5x4 to 4x5
@@ -33,7 +33,7 @@ def backward_elimination(matrix, row, col):
 
 
 def spp_gaussian(coefficient_matrix, constants_matrix, n):
-    solution = np.zeros(n, dtype=np.dtype(Decimal))
+    solution = np.zeros(n)
     index_vector = [i for i in range(n)]
 
     spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, n)
@@ -138,7 +138,7 @@ else:
     col = np.shape(proper_matrix)[1]
 
     # turn our matrix into a numpy matrix array for numpy perks
-    proper_matrix = np.array(proper_matrix, dtype=np.dtype(Decimal))
+    proper_matrix = np.array(proper_matrix)
     print(proper_matrix)
     # call method to start naive_gaussian algorithm
     forward_elimination(proper_matrix, row, col)
