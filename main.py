@@ -30,8 +30,11 @@ def backward_elimination(matrix, row, col):
         # added this block of code because one test result was returning -0 instead of 0
         if solution[i] == -0:
             solution[i] = 0
+
     print("Naive solution:\n", solution)
-    print_to_file(solution)
+    new_lst = (' '.join(str(element) for element in solution))  # removes brackets for the .sol file as per
+    # instructions in assignment
+    print_to_file(new_lst)
 
 
 def spp_gaussian(coefficient_matrix, constants_matrix, n):
@@ -80,7 +83,10 @@ def spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector,
         spp_solution[i] = summation / coefficient_matrix[index_vector[i], i]
 
     print("scaled partial pivoting solution:\n", spp_solution)
-    print_to_file(spp_solution)
+    new_lst = (' '.join(str(element) for element in spp_solution))  # removes brackets for the .sol file as per
+    # instructions in assignment
+    print_to_file(new_lst)
+
 
 def print_to_file(solution):
     input_filename = args.filename
@@ -113,7 +119,6 @@ def main(args):
         for i in range(m):
             for j in range(n):
                 constants_in_row_matrix[i][j] = float(content[i][j])  # change from string to float
-
 
     if args.spp:
         # separate file matrix into a coefficient matrix and a constants matrix for easy operations
