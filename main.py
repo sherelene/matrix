@@ -1,10 +1,10 @@
 # sys.argv[1]
 import numpy as np
 from decimal import *
-
 import sys, getopt
 import argparse
 from argparse import ArgumentParser
+import os
 
 
 def forward_elimination(matrix, row, col):
@@ -31,6 +31,7 @@ def backward_elimination(matrix, row, col):
         if solution[i] == -0:
             solution[i] = 0
     print("Naive solution:\n", solution)
+    print_to_file(solution)
 
 
 def spp_gaussian(coefficient_matrix, constants_matrix, n):
@@ -77,68 +78,81 @@ def spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector,
         for j in range(i + 1, n):
             summation = summation - coefficient_matrix[index_vector[i], j] * spp_solution[j]
         spp_solution[i] = summation / coefficient_matrix[index_vector[i], i]
-    print("spp solution:\n", spp_solution)
+
+    print("scaled partial pivoting solution:\n", spp_solution)
+    print_to_file(spp_solution)
+
+def print_to_file(solution):
+    input_filename = args.filename
+    output_filename = os.path.splitext(input_filename)[0] + ".sol"
+    with open(output_filename, "w") as external_file:
+        print(solution, file=external_file)
+        external_file.close()
+    print("\nThis solution has been placed in an output file named {}".format(output_filename))
 
 
-# start of getting arguments from command line
-parser = argparse.ArgumentParser(description='gaussian algorithms with naive as default and scaled partial pivoting '
-                                             'as an optional flag written as: python3 gaussian <optional-flag> '
-                                             '<filename>')
-parser.add_argument('-spp', '--spp', action="store_true", help="calls spp algorithm")
-parser.add_argument("filename", help="stores filename")
-args = parser.parse_args()  # stores all the arguments int the commandline
+def main(args):
+    with open(args.filename) as file:
+        # declare array we're going to get from the file
+        content = []
 
+        # reads the first line in the file that has the number of the coefficients
+        n = int(file.readline())
+        # number of rows due to the extra array containing the constants
+        m = n + 1
+        # reads the rest of the lines within the file
+        lines = file.readlines()
 
-with open(args.filename) as file:
-    # declare array we're going to get from the file
-    content = []
+        # takes each line read from file and inputs each number in the line into an element into the file content array
+        for line in lines:
+            content.append(line.split())  # split ignores all unnecessary characters like \n or whitespace
 
-    # reads the first line in the file that has the number of the coefficients
-    n = int(file.readline())
-    # number of rows due to the extra array containing the constants
-    m = n + 1
-    # reads the rest of the lines within the file
-    lines = file.readlines()
-
-    # takes each line read from file and inputs each number in the line into an element into the file content array
-    for line in lines:
-        content.append(line.split())  # split ignores all unnecessary characters like \n or whitespace
-
-    # declare and initialize array that we will start using and operating on
-    constants_in_row_matrix = [[0 for i in range(n)] for j in range(m)]
+        # declare and initialize array that we will start using and operating on
+        constants_in_row_matrix = [[0 for i in range(n)] for j in range(m)]
     # formally assign matrix from file into a 2D array
-    for i in range(m):
+        for i in range(m):
+            for j in range(n):
+                constants_in_row_matrix[i][j] = float(content[i][j])  # change from string to float
+
+
+    if args.spp:
+        # separate file matrix into a coefficient matrix and a constants matrix for easy operations
+        coefficient_matrix = np.array(constants_in_row_matrix[:-1])
+        constants_matrix = np.array(constants_in_row_matrix[-1])
+
+        # call method to start scaled partial pivoting algorithm
+        spp_gaussian(coefficient_matrix, constants_matrix, n)
+
+    else:
         for j in range(n):
-            constants_in_row_matrix[i][j] = float(content[i][j])  # change from string to float
+            # assigning an array to another variable passes by reference so whatever changes you make on that variable
+            # will reflect on the original array
+            last_column = constants_in_row_matrix[j]
+            # make constants that are in the last row into the last column
+            last_column.append(constants_in_row_matrix[n][j])
+
+        # remove last row from constants_in_row_matrix for a "proper" matrix that has the constants in the last column
+        proper_matrix = constants_in_row_matrix[:-1]
+
+        # make variables for new number of rows and columns
+        row = np.shape(proper_matrix)[0]
+        col = np.shape(proper_matrix)[1]
+
+        # turn our matrix into a numpy matrix array for numpy perks
+        proper_matrix = np.array(proper_matrix, dtype=np.dtype(Decimal))
+
+        # call method to start naive_gaussian algorithm
+        forward_elimination(proper_matrix, row, col)
 
 
-if args.spp:
-    # separate file matrix into a coefficient matrix and a constants matrix for easy operations
-    coefficient_matrix = np.array(constants_in_row_matrix[:-1])
-    constants_matrix = np.array(constants_in_row_matrix[-1])
+if __name__ == "__main__":
+    # start of getting arguments from command line
+    parser = argparse.ArgumentParser(
+        description='gaussian algorithms with naive as default and scaled partial pivoting '
+                    'as an optional flag written as: python3 gaussian <optional-flag> '
+                    '<filename>')
+    parser.add_argument('-spp', '--spp', action="store_true", help="calls spp algorithm")
+    parser.add_argument("filename", help="stores filename")
+    args = parser.parse_args()  # stores all the arguments int the commandline
 
-    # call method to start scaled partial pivoting algorithm
-    spp_gaussian(coefficient_matrix, constants_matrix, n)
-
-else:
-    for j in range(n):
-        # assigning an array to another variable passes by reference so whatever changes you make on that variable
-        # will reflect on the original array
-        last_column = constants_in_row_matrix[j]
-        # make constants that are in the last row into the last column
-        last_column.append(constants_in_row_matrix[n][j])
-
-    # remove last row from constants_in_row_matrix for a "proper" matrix that has the constants in the last column
-    proper_matrix = constants_in_row_matrix[:-1]
-
-    # make variables for new number of rows and columns
-    row = np.shape(proper_matrix)[0]
-    col = np.shape(proper_matrix)[1]
-
-    # turn our matrix into a numpy matrix array for numpy perks
-    proper_matrix = np.array(proper_matrix, dtype=np.dtype(Decimal))
-
-    # call method to start naive_gaussian algorithm
-    forward_elimination(proper_matrix, row, col)
-
-
+    main(args)
