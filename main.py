@@ -80,29 +80,16 @@ def spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector,
     print("spp solution:\n", spp_solution)
 
 
-argument = False
-
-#parser = argparse.ArgumentParser(description= 'gaussian algorithms with naive as default and scaled partial pivoting '
-                                              #'as an optional flag')
-#parser.add_argument("-spp", "--spp", action="store_true", help='the flag that triggers scaled partial pivoting '
-                                                                  # 'algorithm')
-#parser.add_argument('filename', type=argparse.FileType('r'))
-#args = parser.parse_args()
-#filename = args.filename
-
-args = sys.argv[1:]
-if args[0] == '--spp':
-    argument = True
-    filename = args[-1]
-else:
-    filename = args[-1]
+# start of getting arguments from command line
+parser = argparse.ArgumentParser(description='gaussian algorithms with naive as default and scaled partial pivoting '
+                                             'as an optional flag written as: python3 gaussian <optional-flag> '
+                                             '<filename>')
+parser.add_argument('-spp', '--spp', action="store_true", help="calls spp algorithm")
+parser.add_argument("filename", help="stores filename")
+args = parser.parse_args()  # stores all the arguments int the commandline
 
 
-
-
-
-
-with open(filename) as file:
+with open(args.filename) as file:
     # declare array we're going to get from the file
     content = []
 
@@ -125,7 +112,7 @@ with open(filename) as file:
             constants_in_row_matrix[i][j] = float(content[i][j])  # change from string to float
 
 
-if argument:
+if args.spp:
     # separate file matrix into a coefficient matrix and a constants matrix for easy operations
     coefficient_matrix = np.array(constants_in_row_matrix[:-1])
     constants_matrix = np.array(constants_in_row_matrix[-1])
