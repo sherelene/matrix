@@ -2,7 +2,9 @@
 import numpy as np
 from decimal import *
 
-import sys
+import sys, getopt
+import argparse
+from argparse import ArgumentParser
 
 
 def forward_elimination(matrix, row, col):
@@ -11,46 +13,43 @@ def forward_elimination(matrix, row, col):
             # "[variable, :]" means all columns in that row will be affected
             matrix[i, :] = (matrix[i, k] / matrix[k, k]) * matrix[k, :] - matrix[i, :]  # row subtraction then
             # multiplication and assigning it to the current row
-    print(matrix)
+
     # call function to do backward elimination
     backward_elimination(matrix, row, col)
 
 
 def backward_elimination(matrix, row, col):
     # initialize new array to store the solved coefficients
-    x = np.zeros(col - 1, dtype=np.dtype(Decimal))
+    solution = np.zeros(col - 1, dtype=np.dtype(Decimal))
 
     # iterate backwards for back substitution using numpy because it's faster
     for i in np.arange(row - 1, -1, -1):  # using rows instead of columns because matrix changed from 5x4 to 4x5
         # x[i] = Bi minus dot product of the current row and the updated x array divided by Aii
         # the dot product returns an int or float
-        x[i] = (matrix[i, -1] - np.dot(matrix[i, 0:col - 1], x)) / matrix[i, i]
+        solution[i] = (matrix[i, -1] - np.dot(matrix[i, 0:col - 1], solution)) / matrix[i, i]
         # added this block of code because one test result was returning -0 instead of 0
-        if x[i] == -0:
-            x[i] = 0
-
-    print("answer", x)
+        if solution[i] == -0:
+            solution[i] = 0
+    print("Naive solution:\n", solution)
 
 
 def spp_gaussian(coefficient_matrix, constants_matrix, n):
-    solution = np.zeros(n, dtype=np.dtype(Decimal))
+    spp_solution = np.zeros(n, dtype=np.dtype(Decimal))
     index_vector = [i for i in range(n)]
 
     spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, n)
-    spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector, solution, n)
+    spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector, spp_solution, n)
 
 
 def spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, n):
     # initialising vector of scaling factors
-    print("og", coefficient_matrix)
     scaling_vector = [0 for i in range(n)]
     for i in range(n):
         scalar_max = 0
         for j in range(n):
-            scalar_max = max(scalar_max, np.abs(coefficient_matrix[i, j]))
-        scaling_vector[i] = scalar_max   # finds coefficient with greatest value for each row
-    print(scalar_max)
-    print(scaling_vector)
+            scalar_max = max(scalar_max, np.abs(coefficient_matrix[i, j]))  # finds coefficient with greatest value
+        # for each row
+        scaling_vector[i] = scalar_max
 
     # pivot row
     for k in range(n - 1):
@@ -58,36 +57,51 @@ def spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, 
         max_index = k
         for i in range(k, n):
             ratio = np.abs(coefficient_matrix[index_vector[i], k]) / scaling_vector[index_vector[i]]
-            print("ratio", ratio)
             if ratio > ratio_max:
                 ratio_max = ratio
                 max_index = i
-        index_vector[max_index], index_vector[k] = index_vector[k], index_vector[max_index]
-        print(index_vector)
-        print(max_index)
+        index_vector[max_index], index_vector[k] = index_vector[k], index_vector[max_index] #  scaping of index
 
-        for i in range(k+1, n):
+        for i in range(k + 1, n):
             multiplier = coefficient_matrix[index_vector[i], k] / coefficient_matrix[index_vector[k], k]
             for j in range(k, n):
                 coefficient_matrix[index_vector[i], j] = coefficient_matrix[index_vector[i], j] - multiplier * \
-                                                  coefficient_matrix[index_vector[k], j]
+                                                         coefficient_matrix[index_vector[k], j]
             constants_matrix[index_vector[i]] = constants_matrix[index_vector[i]] - multiplier * constants_matrix[
                 index_vector[k]]
-    print("new", coefficient_matrix)
 
 
-def spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector, solution, n):
-    solution[n-1] = constants_matrix[index_vector[n-1]] /coefficient_matrix[index_vector[n-1], n-1]
-    for i in range(n-1, -1, -1):
+def spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector, spp_solution, n):
+    for i in range(n - 1, -1, -1):
         summation = constants_matrix[index_vector[i]]
-        for j in range(i+1, n):
-            summation = summation - coefficient_matrix[index_vector[i], j] * solution[j]
-        solution[i] = summation / coefficient_matrix[index_vector[i], i]
-    print("solution", solution)
+        for j in range(i + 1, n):
+            summation = summation - coefficient_matrix[index_vector[i], j] * spp_solution[j]
+        spp_solution[i] = summation / coefficient_matrix[index_vector[i], i]
+    print("spp solution:\n", spp_solution)
+
+
+argument = False
+
+#parser = argparse.ArgumentParser(description= 'gaussian algorithms with naive as default and scaled partial pivoting '
+                                              #'as an optional flag')
+#parser.add_argument("-spp", "--spp", action="store_true", help='the flag that triggers scaled partial pivoting '
+                                                                  # 'algorithm')
+#parser.add_argument('filename', type=argparse.FileType('r'))
+#args = parser.parse_args()
+#filename = args.filename
+
+args = sys.argv[1:]
+if args[0] == '--spp':
+    argument = True
+    filename = args[-1]
+else:
+    filename = args[-1]
 
 
 
-filename = "practice_input.txt"
+
+
+
 with open(filename) as file:
     # declare array we're going to get from the file
     content = []
@@ -110,9 +124,6 @@ with open(filename) as file:
         for j in range(n):
             constants_in_row_matrix[i][j] = float(content[i][j])  # change from string to float
 
-    print("og", constants_in_row_matrix)
-
-argument = True
 
 if argument:
     # separate file matrix into a coefficient matrix and a constants matrix for easy operations
@@ -139,6 +150,8 @@ else:
 
     # turn our matrix into a numpy matrix array for numpy perks
     proper_matrix = np.array(proper_matrix, dtype=np.dtype(Decimal))
-    print(proper_matrix)
+
     # call method to start naive_gaussian algorithm
     forward_elimination(proper_matrix, row, col)
+
+
