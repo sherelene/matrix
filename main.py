@@ -31,15 +31,17 @@ def backward_elimination(matrix, row, col):
 
     print("answer", x)
 
+
 def spp_gaussian(coefficient_matrix, constants_matrix, n):
-    solution_vector = [i for i in range(n)]
+    solution = np.zeros(n, dtype=np.dtype(Decimal))
     index_vector = [i for i in range(n)]
 
     spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, n)
+    spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector, solution, n)
+
 
 def spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, n):
     # initialising vector of scaling factors
-    #scaling_vector = np.zeros(n, dtype=np.dtype(Decimal))
     print("og", coefficient_matrix)
     scaling_vector = [0 for i in range(n)]
     for i in range(n):
@@ -74,14 +76,19 @@ def spp_forward_elimination(coefficient_matrix, constants_matrix, index_vector, 
     print("new", coefficient_matrix)
 
 
+def spp_backward_elimination(coefficient_matrix, constants_matrix, index_vector, solution, n):
+    solution[n-1] = constants_matrix[index_vector[n-1]] /coefficient_matrix[index_vector[n-1], n-1]
+    for i in range(n-1, -1, -1):
+        summation = constants_matrix[index_vector[i]]
+        for j in range(i+1, n):
+            summation = summation - coefficient_matrix[index_vector[i], j] * solution[j]
+        solution[i] = summation / coefficient_matrix[index_vector[i], i]
+    print("solution", solution)
 
-# def spp_backward_elimination():
 
 
-# def spp_scaling_pivot():
-
-filename = "test2.txt"
-with open("test2.txt") as file:
+filename = "practice_input.txt"
+with open(filename) as file:
     # declare array we're going to get from the file
     content = []
 
